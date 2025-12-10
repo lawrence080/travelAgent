@@ -1,79 +1,93 @@
-import { Router, Request, Response } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
+import { registerUserWithCognito, signInWithCognito } from '../utils/awsCognito';
+import { saveUserProfile } from '../utils/rdsClient';
+import { ApiError } from '../middleware/errorHandler';
 
 const router = Router();
 
 // Sign up endpoint
-router.post('/signup', async (req: Request, res: Response) => {
+router.post('/signup', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { name, email, password, confirm } = req.body;
+    const { name, email, password,birthdate, confirm } = req.body;
 
-    // Validation
     if (!name || !email || !password || !confirm) {
-      return res.status(400).json({ error: 'All fields are required' });
+      throw new ApiError(400, 'All fields are required');
     }
 
     if (password !== confirm) {
-      return res.status(400).json({ error: 'Passwords do not match' });
+      throw new ApiError(400, 'Passwords do not match');
     }
 
     if (password.length < 8) {
-      return res.status(400).json({ error: 'Password must be at least 8 characters' });
+      throw new ApiError(400, 'Password must be at least 8 characters');
     }
+    // if(!birthdate){
+    //   throw new ApiError(400, 'Birthdate is required');
+    // }
 
-    // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      return res.status(400).json({ error: 'Invalid email format' });
+      throw new ApiError(400, 'Invalid email format');
     }
 
-    // TODO: Check if user already exists in AWS DynamoDB/Cognito
-    // TODO: Hash password (use bcrypt)
-    // TODO: Create user in AWS Cognito or DynamoDB
-    // TODO: Send verification email
+    const signUpResponse = await registerUserWithCognito(name, email, password );
+    const cognitoUserId = signUpResponse.UserSub;
 
-    // For now, mock success
+    if (!cognitoUserId) {
+      throw new ApiError(500, 'Unable to determine Cognito user identifier');
+    }
+
+    await saveUserProfile({
+      id: cognitoUserId,
+      name,
+      email,
+    });
+
     res.status(201).json({
       success: true,
       message: 'Account created successfully',
       user: {
-        id: 'user-' + Date.now(),
+        id: cognitoUserId,
         name,
         email,
+        confirmed: signUpResponse.UserConfirmed ?? false,
       },
     });
   } catch (error) {
-    console.error('Signup error:', error);
-    res.status(500).json({ error: 'Failed to create account' });
+    next(error);
   }
 });
 
 // Sign in endpoint
-router.post('/signin', async (req: Request, res: Response) => {
+router.post('/signin', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email, password } = req.body;
 
-    // Validation
     if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password are required' });
+      throw new ApiError(400, 'Email and password are required');
     }
 
-    // TODO: Verify user exists in AWS Cognito/DynamoDB
-    // TODO: Verify password hash
-    // TODO: Generate JWT token or use Cognito tokens
+    const authResponse = await signInWithCognito(email, password);
+    const tokens = authResponse.AuthenticationResult;
 
-    // For now, mock success
+    if (!tokens) {
+      throw new ApiError(500, 'Authentication tokens were not returned by Cognito');
+    }
+
     res.status(200).json({
       success: true,
       message: 'Signed in successfully',
-      token: 'mock-jwt-token-' + Date.now(),
-      user: {
-        id: 'user-123',
-        email,
+      tokens: {
+        accessToken: tokens.AccessToken,
+        idToken: tokens.IdToken,
+        refreshToken: tokens.RefreshToken,
+        expiresIn: tokens.ExpiresIn,
+        tokenType: tokens.TokenType,
       },
+      challengeName: authResponse.ChallengeName,
     });
   } catch (error) {
-    console.error('Signin error:', error);
-    res.status(500).json({ error: 'Failed to sign in' });
+    next(error);
   }
 });
 

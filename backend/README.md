@@ -39,7 +39,7 @@ npm install
 cp .env.example .env
 ```
 
-3. Configure environment variables in `.env` as needed.
+3. Configure environment variables in `.env` as needed. Provide your AWS Cognito user pool, app client, and RDS credentials.
 
 ### Development
 
@@ -49,6 +49,12 @@ npm run dev
 ```
 
 The server will run on `http://localhost:3000` by default.
+
+### AWS integrations
+
+- User sign-up is performed against **AWS Cognito** using the configured User Pool and App Client.
+- Newly created users are persisted to **AWS RDS** (PostgreSQL) via the connection settings in `.env`.
+- Sign-in authenticates against Cognito and returns Cognito-issued tokens.
 
 ### Build
 

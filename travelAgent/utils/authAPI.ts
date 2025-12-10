@@ -1,7 +1,7 @@
 // API service for authentication
 // Update API_BASE_URL to match your backend when deployed
 
-const API_BASE_URL = 'http://localhost:3000/api'; // Change for production
+const API_BASE_URL = 'http://192.168.1.89:3000/api'; // Change for production
 
 export interface SignUpData {
   name: string;
