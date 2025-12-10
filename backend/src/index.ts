@@ -1,6 +1,7 @@
 import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import authRoutes from './routes/auth';
 
 dotenv.config();
 
@@ -20,6 +21,9 @@ app.get('/api/health', (req: Request, res: Response) => {
 app.get('/', (req: Request, res: Response) => {
   res.json({ message: 'Welcome to Travel Agent API' });
 });
+
+// Auth routes
+app.use('/api/auth', authRoutes);
 
 // Error handling middleware
 app.use((err: any, req: Request, res: Response) => {
