@@ -1,5 +1,14 @@
 import { useMemo, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, FlatList } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TextInput,
+  TouchableOpacity,
+  FlatList,
+  useWindowDimensions,
+} from 'react-native';
 import { Image } from 'expo-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -32,6 +41,7 @@ const plans = [
 
 export default function HomeScreen() {
   const [activeFilter, setActiveFilter] = useState(filters[0]);
+  const { height } = useWindowDimensions();
 
   const contentInset = useMemo(
     () => ({ top: 0, bottom: 24, left: 0, right: 0 }),
@@ -70,7 +80,9 @@ export default function HomeScreen() {
           <TextInput
             placeholder="e.g. I want to go to Tokyo in March for 7 days"
             placeholderTextColor="#8F9BB3"
-            style={styles.promptInput}
+            multiline
+            style={[styles.promptInput, { minHeight: height * 0.25 }]}
+            textAlignVertical="top"
           />
           <View style={styles.filterRow}>
             <ScrollView
