@@ -132,15 +132,7 @@ You can keep your database password out of `.env` by storing it in AWS Secrets M
    DB_SECRET_NAME=travelagent/db-credentials
    ```
 
-5. **Use the provided helper** at `src/config/secrets.ts` to fetch credentials inside the app (auto-caches the secret):
-   ```ts
-   import { getDbCredentials } from './config/secrets';
-
-   const creds = await getDbCredentials();
-   // Use creds.username / creds.password / creds.host / creds.dbName / creds.port
-   ```
-
-6. **Optional prefetch**: The server calls `warmDbCredentials()` on startup so misconfigured IAM/secret issues surface in logs early without crashing the API.
+5. **Connect to the DB** with the retrieved values instead of hardcoded `RDS_USER`/`RDS_PASSWORD` values.
 
 ## Architecture
 
