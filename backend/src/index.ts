@@ -2,6 +2,8 @@ import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import authRoutes from './routes/auth';
+import { warmDbCredentials } from './config/secrets';
+import { logger } from './utils/logger';
 
 dotenv.config();
 
@@ -33,4 +35,9 @@ app.use(errorHandler);
 // Start server
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
+});
+
+// Prefetch DB credentials (optional) so we fail fast if the IAM role/secret is misconfigured
+warmDbCredentials().catch((error) => {
+  logger.warn('Database credentials are not available yet', error);
 });
