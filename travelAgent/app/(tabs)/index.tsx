@@ -41,6 +41,7 @@ const plans = [
 
 export default function HomeScreen() {
   const [activeFilter, setActiveFilter] = useState(filters[0]);
+  const [menuOpen, setMenuOpen] = useState(false);
   const { height } = useWindowDimensions();
 
   const contentInset = useMemo(
@@ -66,9 +67,67 @@ export default function HomeScreen() {
             </View>
             <Text style={styles.brandName}>GooseTravel</Text>
           </View>
-          <TouchableOpacity accessibilityRole="button" style={styles.avatarButton}>
-            <Ionicons name="person" size={20} color="#0F172A" />
-          </TouchableOpacity>
+          <View style={styles.setupWrapper}>
+            <TouchableOpacity
+              accessibilityRole="button"
+              style={styles.setupButton}
+              onPress={() => setMenuOpen((open) => !open)}>
+              <Ionicons name="settings-outline" size={16} color="#0F172A" />
+              <Text style={styles.setupLabel}>Setup</Text>
+              <Ionicons
+                name={menuOpen ? 'chevron-up' : 'chevron-down'}
+                size={16}
+                color="#0F172A"
+              />
+            </TouchableOpacity>
+            {menuOpen && (
+              <View style={styles.dropdownMenu}>
+                <TouchableOpacity accessibilityRole="button" style={styles.menuItem}>
+                  <Text style={styles.menuText}>Change account</Text>
+                </TouchableOpacity>
+                <View style={styles.menuDivider} />
+                <TouchableOpacity accessibilityRole="button" style={styles.menuItem}>
+                  <Text style={styles.menuText}>Logout</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
+        </View>
+
+        <View style={styles.profileCard}>
+          <View style={styles.profileHeader}>
+            <View style={styles.profileAvatarWrapper}>
+              <Image
+                source={{
+                  uri: 'https://images.unsplash.com/photo-1502685104226-ee32379fefbe?auto=format&fit=crop&w=300&q=80',
+                }}
+                style={styles.profileAvatar}
+              />
+            </View>
+            <View style={styles.profileTextBlock}>
+              <Text style={styles.profileName}>Jane Doe</Text>
+              <Text style={styles.profileMeta}>Female · 24</Text>
+              <Text style={styles.profileMeta}>123 Main St, Anytown, USA</Text>
+            </View>
+          </View>
+          <View style={styles.profileDetails}>
+            <View style={styles.detailRow}>
+              <Text style={styles.detailLabel}>Name</Text>
+              <Text style={styles.detailValue}>Jane Doe</Text>
+            </View>
+            <View style={styles.detailRow}>
+              <Text style={styles.detailLabel}>Gender</Text>
+              <Text style={styles.detailValue}>Female</Text>
+            </View>
+            <View style={styles.detailRow}>
+              <Text style={styles.detailLabel}>Age</Text>
+              <Text style={styles.detailValue}>24</Text>
+            </View>
+            <View style={[styles.detailRow, styles.detailRowLast]}>
+              <Text style={styles.detailLabel}>Address</Text>
+              <Text style={styles.detailValue}>123 Main St, Anytown, USA</Text>
+            </View>
+          </View>
         </View>
 
         <Text style={styles.heading}>Where are we going next?</Text>
@@ -168,6 +227,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
   },
+  setupWrapper: {
+    position: 'relative',
+  },
+  setupButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    backgroundColor: '#FFE6C6',
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: '#FFC27A',
+  },
+  setupLabel: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#0F172A',
+  },
   logoWrap: {
     width: 40,
     height: 40,
@@ -192,6 +270,111 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFE6C6',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  dropdownMenu: {
+    position: 'absolute',
+    top: 44,
+    right: 0,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    paddingVertical: 4,
+    width: 170,
+    shadowColor: '#F2D1AE',
+    shadowOpacity: 0.45,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 5,
+    borderWidth: 1,
+    borderColor: '#F3E8DD',
+  },
+  menuItem: {
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+  },
+  menuText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#0F172A',
+  },
+  menuDivider: {
+    height: 1,
+    backgroundColor: '#F3E8DD',
+    marginHorizontal: 12,
+  },
+  profileCard: {
+    backgroundColor: '#FFFBF5',
+    borderRadius: 20,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#F3E8DD',
+    shadowColor: '#F2D1AE',
+    shadowOpacity: 0.35,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 4,
+    gap: 14,
+  },
+  profileHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  profileAvatarWrapper: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: '#FFE6C6',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  profileAvatar: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+  },
+  profileTextBlock: {
+    flex: 1,
+    gap: 4,
+  },
+  profileName: {
+    fontSize: 22,
+    fontWeight: '800',
+    color: '#0F172A',
+  },
+  profileMeta: {
+    fontSize: 14,
+    color: '#475467',
+    fontWeight: '600',
+  },
+  profileDetails: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: '#F3E8DD',
+    overflow: 'hidden',
+  },
+  detailRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F3E8DD',
+  },
+  detailRowLast: {
+    borderBottomWidth: 0,
+  },
+  detailLabel: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#0F172A',
+  },
+  detailValue: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#475467',
+    maxWidth: '65%',
+    textAlign: 'right',
   },
   heading: {
     fontSize: 28,
