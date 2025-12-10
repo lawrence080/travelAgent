@@ -34,7 +34,7 @@ export default function HomeScreen() {
   const [activeFilter, setActiveFilter] = useState(filters[0]);
 
   const contentInset = useMemo(
-    () => ({ top: 0, bottom: 32, left: 24, right: 24 }),
+    () => ({ top: 0, bottom: 24, left: 0, right: 0 }),
     []
   );
 
@@ -143,6 +143,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingTop: 12,
     paddingBottom: 32,
+    paddingHorizontal: 20,
     gap: 16,
   },
   headerRow: {
