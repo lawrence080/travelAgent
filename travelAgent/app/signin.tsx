@@ -181,7 +181,7 @@ export default function SignInScreen() {
 
           <View style={styles.footer}>
             <ThemedText style={styles.noAccount}>Don’t have an account?</ThemedText>
-            <Pressable onPress={() => router.back()} disabled={loading}>
+            <Pressable onPress={() => router.replace("/create-account")} disabled={loading}>
               <ThemedText style={styles.createAccount}>Create Account</ThemedText>
             </Pressable>
           </View>
