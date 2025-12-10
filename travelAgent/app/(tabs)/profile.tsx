@@ -1,135 +1,118 @@
 import { useMemo, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, FlatList } from 'react-native';
-import { Image } from 'expo-image';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 
-const filters = [
-  'Weekend trip',
-  'Next month',
-  'Family-friendly',
-  'Under $1500',
-];
+const initialProfile = {
+  name: 'Jane Doe',
+  gender: 'Female',
+  age: '24',
+  address: '123 Main St, Anytown, USA',
+};
 
-const plans = [
-  {
-    id: '1',
-    destination: 'Paris, France',
-    dates: 'Sep 12 – Sep 20',
-    status: 'Draft',
-    accent: '#FFE6C6',
-    accentDot: '#FFB76B',
-  },
-  {
-    id: '2',
-    destination: 'Tokyo, Japan',
-    dates: 'Oct 03 – Oct 10',
-    status: 'Planned',
-    accent: '#D9ECFF',
-    accentDot: '#6BB1FF',
-  },
-];
+export default function ProfileScreen() {
+  const [profile, setProfile] = useState(initialProfile);
+  const [editingField, setEditingField] = useState<keyof typeof initialProfile | null>(null);
 
-export default function HomeScreen() {
-  const [activeFilter, setActiveFilter] = useState(filters[0]);
-
-  const contentInset = useMemo(
-    () => ({ top: 0, bottom: 24, left: 0, right: 0 }),
+  const paymentCard = useMemo(
+    () => ({
+      brand: 'VISA',
+      last4: '4242',
+      label: 'Default',
+      gradient: ['#E4EDFB', '#E4EDFB'],
+    }),
     []
   );
+
+  const handleChange = (field: keyof typeof initialProfile, value: string) => {
+    setProfile((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const InfoValue = ({ field }: { field: keyof typeof initialProfile }) => {
+    const isEditing = editingField === field;
+
+    if (isEditing) {
+      return (
+        <TextInput
+          value={profile[field]}
+          onChangeText={(text) => handleChange(field, text)}
+          style={styles.input}
+          autoFocus
+          placeholder={field === 'address' ? 'Enter your address' : undefined}
+        />
+      );
+    }
+
+    return <Text style={styles.infoValue}>{profile[field]}</Text>;
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={styles.content}
         contentInsetAdjustmentBehavior="automatic"
-        showsVerticalScrollIndicator={false}
-        contentInset={contentInset}>
-        <View style={styles.headerRow}>
-          <View style={styles.brandRow}>
-            <View style={styles.logoWrap}>
-              <Image
-                source={require('@/assets/images/logo-without-word.png')}
-                style={styles.logo}
-                contentFit="contain"
-              />
-            </View>
-            <Text style={styles.brandName}>GooseTravel</Text>
-          </View>
-          <TouchableOpacity accessibilityRole="button" style={styles.avatarButton}>
-            <Ionicons name="person" size={20} color="#0F172A" />
-          </TouchableOpacity>
-        </View>
-
-        <Text style={styles.heading}>Where are we going next?</Text>
-        <Text style={styles.subheading}>
-          Tell me your destination and dates in one sentence.
-        </Text>
-
-        <View style={styles.promptCard}>
-          <TextInput
-            placeholder="e.g. I want to go to Tokyo in March for 7 days"
-            placeholderTextColor="#8F9BB3"
-            style={styles.promptInput}
+        showsVerticalScrollIndicator={false}>
+        <View style={styles.avatarWrap}>
+          <Image
+            source={{
+              uri: 'https://images.unsplash.com/photo-1544723795-3fb6469f5b39?auto=format&fit=crop&w=400&q=80',
+            }}
+            style={styles.avatar}
+            contentFit="cover"
           />
-          <View style={styles.filterRow}>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.filterChips}>
-              {filters.map((label) => {
-                const selected = activeFilter === label;
-                return (
-                  <TouchableOpacity
-                    key={label}
-                    onPress={() => setActiveFilter(label)}
-                    style={[styles.chip, selected && styles.chipActive]}
-                    accessibilityRole="button"
-                    accessibilityState={{ selected }}>
-                    <Text style={[styles.chipLabel, selected && styles.chipLabelActive]}>
-                      {label}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </ScrollView>
-            <TouchableOpacity style={styles.sendButton} accessibilityRole="button">
-              <Ionicons name="send" size={18} color="#FFFFFF" />
-            </TouchableOpacity>
-          </View>
+        </View>
+        <Text style={styles.name}>{profile.name}</Text>
+        <Text style={styles.meta}>{`${profile.gender} · ${profile.age}`}</Text>
+        <Text style={styles.address}>{profile.address}</Text>
+
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Personal Info</Text>
+          <View style={styles.divider} />
+
+          {(Object.keys(profile) as Array<keyof typeof initialProfile>).map((field) => (
+            <View key={field} style={styles.infoRow}>
+              <View style={styles.infoTextGroup}>
+                <Text style={styles.infoLabel}>{field.charAt(0).toUpperCase() + field.slice(1)}</Text>
+                <InfoValue field={field} />
+              </View>
+              <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel={`Edit ${field}`}
+                onPress={() => setEditingField(field)}
+                style={styles.iconButton}>
+                <Ionicons name="pencil" size={18} color="#FF8A4C" />
+              </TouchableOpacity>
+            </View>
+          ))}
         </View>
 
-        <View style={styles.plansHeader}>
-          <Text style={styles.plansTitle}>Your Plans</Text>
-          <TouchableOpacity accessibilityRole="button">
-            <Text style={styles.seeAll}>See all</Text>
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Payment</Text>
+          <View style={styles.paymentCard}>
+            <View style={styles.paymentLeft}>
+              <View style={styles.brandBadge}>
+                <Text style={styles.brandText}>{paymentCard.brand}</Text>
+              </View>
+              <Text style={styles.cardNumber}>•••• {paymentCard.last4}</Text>
+            </View>
+            <View style={styles.tag}>
+              <Text style={styles.tagText}>{paymentCard.label}</Text>
+            </View>
+          </View>
+
+          <TouchableOpacity style={styles.addPaymentButton} accessibilityRole="button">
+            <Ionicons name="add" size={18} color="#FF8A4C" />
+            <Text style={styles.addPaymentText}>Add Payment Method</Text>
           </TouchableOpacity>
         </View>
-
-        <FlatList
-          data={plans}
-          keyExtractor={(item) => item.id}
-          scrollEnabled={false}
-          ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
-          renderItem={({ item }) => (
-            <View style={[styles.planCard, { backgroundColor: item.accent }]}
-              accessibilityRole="button">
-              <View style={styles.planLeft}>
-                <View style={[styles.statusDot, { backgroundColor: item.accentDot }]} />
-              </View>
-              <View style={styles.planDetails}>
-                <View style={styles.planHeaderRow}>
-                  <Text style={styles.planDestination}>{item.destination}</Text>
-                  <View style={[styles.statusBadge, { backgroundColor: '#FFF5E8' }]}>
-                    <Text style={styles.statusLabel}>{item.status}</Text>
-                  </View>
-                </View>
-                <Text style={styles.planDates}>{item.dates}</Text>
-              </View>
-              <Ionicons name="chevron-forward" size={18} color="#0F172A" />
-            </View>
-          )}
-        />
       </ScrollView>
     </SafeAreaView>
   );
@@ -140,185 +123,162 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFF7F1',
   },
-  scrollContent: {
-    paddingTop: 12,
-    paddingBottom: 32,
+  content: {
+    alignItems: 'center',
     paddingHorizontal: 20,
+    paddingBottom: 32,
     gap: 16,
   },
-  headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+  avatarWrap: {
+    marginTop: 12,
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    overflow: 'hidden',
+    borderWidth: 3,
+    borderColor: '#FFE0C9',
+    backgroundColor: '#FFEEDD',
   },
-  brandRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  avatar: {
+    width: '100%',
+    height: '100%',
   },
-  logoWrap: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    backgroundColor: '#FFF0D9',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  logo: {
-    width: 28,
-    height: 28,
-  },
-  brandName: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#0F172A',
-  },
-  avatarButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#FFE6C6',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  heading: {
-    fontSize: 28,
+  name: {
+    fontSize: 26,
     fontWeight: '800',
     color: '#0F172A',
-    lineHeight: 34,
   },
-  subheading: {
-    fontSize: 14,
-    color: '#475467',
-    lineHeight: 20,
-  },
-  promptCard: {
-    backgroundColor: '#FFFCF8',
-    borderRadius: 20,
-    padding: 14,
-    shadowColor: '#F2D1AE',
-    shadowOpacity: 0.4,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 3,
-  },
-  promptInput: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 14,
-    paddingHorizontal: 14,
-    paddingVertical: 14,
-    borderColor: '#F3E8DD',
-    borderWidth: 1,
-    fontSize: 14,
-    color: '#0F172A',
-  },
-  filterRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 12,
-    gap: 8,
-  },
-  filterChips: {
-    flexDirection: 'row',
-    gap: 8,
-    paddingRight: 8,
-  },
-  chip: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 12,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#F2E8DD',
-  },
-  chipActive: {
-    backgroundColor: '#FFE6C6',
-    borderColor: '#FFC27A',
-  },
-  chipLabel: {
-    fontSize: 13,
-    color: '#475467',
+  meta: {
+    fontSize: 16,
+    color: '#8F9BB3',
     fontWeight: '600',
   },
-  chipLabelActive: {
-    color: '#0F172A',
+  address: {
+    fontSize: 14,
+    color: '#8F9BB3',
+    textAlign: 'center',
   },
-  sendButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
-    backgroundColor: '#FF8A4C',
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#F2D1AE',
-    shadowOpacity: 0.5,
-    shadowRadius: 10,
+  card: {
+    width: '100%',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 18,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#F2E7DB',
+    shadowColor: '#0F172A',
+    shadowOpacity: 0.06,
     shadowOffset: { width: 0, height: 4 },
-    elevation: 3,
+    shadowRadius: 12,
   },
-  plansHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  plansTitle: {
+  cardTitle: {
     fontSize: 18,
     fontWeight: '700',
     color: '#0F172A',
   },
-  seeAll: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#FF8A4C',
+  divider: {
+    height: 1,
+    backgroundColor: '#F3E8DD',
+    marginVertical: 12,
   },
-  planCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderRadius: 16,
-    paddingHorizontal: 14,
-    paddingVertical: 16,
-    gap: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 199, 134, 0.3)',
-  },
-  planLeft: {
-    width: 10,
-    alignItems: 'center',
-  },
-  statusDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-  },
-  planDetails: {
-    flex: 1,
-    gap: 4,
-  },
-  planHeaderRow: {
+  infoRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    gap: 8,
+    paddingVertical: 8,
   },
-  planDestination: {
+  infoTextGroup: {
+    flex: 1,
+  },
+  infoLabel: {
+    fontSize: 13,
+    color: '#8F9BB3',
+    marginBottom: 4,
+  },
+  infoValue: {
     fontSize: 16,
     fontWeight: '700',
     color: '#0F172A',
-    flex: 1,
   },
-  statusBadge: {
+  input: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#0F172A',
+    paddingVertical: 4,
     paddingHorizontal: 8,
+    borderWidth: 1,
+    borderColor: '#FFE0C9',
+    borderRadius: 10,
+    backgroundColor: '#FFF8F3',
+  },
+  iconButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#FFF2E8',
+    marginLeft: 12,
+  },
+  paymentCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#EAF0FE',
+    borderRadius: 16,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: '#D9E3FA',
+    marginTop: 12,
+  },
+  paymentLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  brandBadge: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 8,
     paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderWidth: 1,
+    borderColor: '#E2E8F5',
+  },
+  brandText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#0F172A',
+  },
+  cardNumber: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#0F172A',
+  },
+  tag: {
+    backgroundColor: '#14339D',
+    paddingVertical: 4,
+    paddingHorizontal: 10,
     borderRadius: 12,
   },
-  statusLabel: {
-    fontSize: 12,
+  tagText: {
+    color: '#FFFFFF',
     fontWeight: '700',
-    color: '#FF8A4C',
+    fontSize: 12,
   },
-  planDates: {
-    fontSize: 14,
-    color: '#475467',
-    fontWeight: '600',
+  addPaymentButton: {
+    marginTop: 12,
+    height: 48,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: '#FF8A4C',
+    backgroundColor: '#FFF7F1',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  addPaymentText: {
+    color: '#FF8A4C',
+    fontWeight: '700',
+    fontSize: 15,
   },
 });
