@@ -16,6 +16,7 @@ import { ThemedText } from '@/components/themed-text';
 import { useAuth } from '@/contexts/auth-context';
 import { useRouter } from 'expo-router';
 import { authAPI, type SignInData } from '@/utils/authAPI';
+import { Image } from 'react-native';
 
 const { height: WINDOW_HEIGHT } = Dimensions.get('window');
 const CARD_MAX_HEIGHT = Math.round(WINDOW_HEIGHT * 0.78);
@@ -81,9 +82,10 @@ export default function SignInScreen() {
       >
         <View style={styles.container}>
           <View style={styles.headerArea}>
-            <View style={styles.logo}>
-              <Text style={styles.logoEmoji}>🪿</Text>
-            </View>
+              <Image
+                source={require('../assets/images/logo-yellow-background.png')}
+                style={styles.logo}
+              />
             <ThemedText type="title" style={styles.brand}>
               GooseTravel
             </ThemedText>
@@ -178,7 +180,7 @@ export default function SignInScreen() {
 
           <View style={styles.footer}>
             <ThemedText style={styles.noAccount}>Don't have an account?</ThemedText>
-            <Pressable onPress={() => router.push('/create-account')} disabled={loading}>
+            <Pressable onPress={() => router.back()} disabled={loading}>
               <ThemedText style={styles.createAccount}>Create Account</ThemedText>
             </Pressable>
           </View>
@@ -191,7 +193,7 @@ export default function SignInScreen() {
 const PINK = '#ffd7e6';
 const PRIMARY = '#ff6f8a';
 const ERROR = '#ef5350';
-
+const TITLE_COLOR = '#111';
 const styles = StyleSheet.create({
   flex: { flex: 1 },
   safe: {
@@ -210,19 +212,17 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   logo: {
-    width: 60,
-    height: 60,
+    width: 100,
+    height: 100,
     borderRadius: 999,
-    backgroundColor: '#FFCE2E',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 6,
-  },
-  logoEmoji: {
-    fontSize: 28,
+    overflow: 'hidden',
   },
   brand: {
-    fontSize: 16,
+    color: TITLE_COLOR,
+    fontSize: 22,
     marginTop: 2,
   },
   card: {
@@ -237,6 +237,7 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   welcome: {
+    color: TITLE_COLOR,
     fontSize: 22,
     marginBottom: 4,
   },

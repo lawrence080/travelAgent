@@ -25,11 +25,10 @@ app.get('/', (req: Request, res: Response) => {
 // Auth routes
 app.use('/api/auth', authRoutes);
 
-// Error handling middleware
-app.use((err: any, req: Request, res: Response) => {
-  console.error(err.stack);
-  res.status(500).json({ error: 'Internal Server Error' });
-});
+import { errorHandler } from './middleware/errorHandler';
+
+// Error handling middleware (use centralized handler)
+app.use(errorHandler);
 
 // Start server
 app.listen(port, () => {

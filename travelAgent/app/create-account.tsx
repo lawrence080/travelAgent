@@ -16,6 +16,7 @@ import { ThemedText } from '@/components/themed-text';
 import { useAuth } from '@/contexts/auth-context';
 import { useRouter } from 'expo-router';
 import { authAPI, type SignUpData } from '@/utils/authAPI';
+import { Image } from 'react-native';
 
 const { height: WINDOW_HEIGHT } = Dimensions.get('window');
 const CARD_MAX_HEIGHT = Math.round(WINDOW_HEIGHT * 0.80);
@@ -95,9 +96,10 @@ export default function CreateAccountScreen() {
       >
         <View style={styles.container}>
           <View style={styles.headerArea}>
-            <View style={styles.logo}>
-              <Text style={styles.logoEmoji}>🪿</Text>
-            </View>
+            <Image
+                source={require('../assets/images/logo-yellow-background.png')}
+                style={styles.logo}
+              />
             <ThemedText type="title" style={styles.brand}>
               GooseTravel
             </ThemedText>
@@ -206,7 +208,7 @@ export default function CreateAccountScreen() {
 
 const PRIMARY = '#ff6f8a';
 const ERROR = '#ef5350';
-
+const TITLE_COLOR = '#111';
 const styles = StyleSheet.create({
   flex: { flex: 1 },
   safe: {
@@ -225,19 +227,22 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   logo: {
-    width: 60,
-    height: 60,
-    borderRadius: 999,
-    backgroundColor: '#FFCE2E',
+    width: 100,
+    height: 100,
+    borderRadius: 9999,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 6,
   },
-  logoEmoji: {
-    fontSize: 28,
-  },
+  // logoImage: {
+  //   width: 80,
+  //   height: 80,
+  //   alignItems: 'center',
+  //   justifyContent: 'center',
+  // },
   brand: {
-    fontSize: 16,
+    color: TITLE_COLOR,
+    fontSize: 20,
     marginTop: 2,
   },
   card: {
@@ -252,6 +257,7 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   welcome: {
+    color: TITLE_COLOR,
     fontSize: 22,
     marginBottom: 4,
   },
