@@ -17,6 +17,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@aws-sdk/client-secrets-manager": "^3.948.0",
     "@aws-sdk/client-cognito-identity-provider": "^3.948.0",
     "@aws-sdk/client-secrets-manager": "^3.948.0",
     "@types/pg": "^8.15.6",

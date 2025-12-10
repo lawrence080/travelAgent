@@ -1,10 +1,10 @@
 import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import authRoutes from './routes/auth';
-import { env } from './utils/environment';
+import { warmDbCredentials } from './config/secrets';
 import { logger } from './utils/logger';
-import { checkDatabaseConnection } from './utils/rdsClient';
-import { errorHandler } from './middleware/errorHandler';
+
+dotenv.config();
 
 const app: Express = express();
 
@@ -34,4 +34,14 @@ checkDatabaseConnection().catch((error) =>
 
 app.listen(env.port,env.host, () => {
   logger.info(`Server is running at http://${env.host}:${env.port}`);
+});
+
+// Prefetch DB credentials (optional) so we fail fast if the IAM role/secret is misconfigured
+warmDbCredentials().catch((error) => {
+  logger.warn('Database credentials are not available yet', error);
+});
+
+// Prefetch DB credentials (optional) so we fail fast if the IAM role/secret is misconfigured
+warmDbCredentials().catch((error) => {
+  logger.warn('Database credentials are not available yet', error);
 });
