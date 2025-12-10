@@ -1,10 +1,10 @@
 import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import authRoutes from './routes/auth';
-import { warmDbCredentials } from './config/secrets';
+import { env } from './utils/environment';
 import { logger } from './utils/logger';
-
-dotenv.config();
+// import { checkDatabaseConnection } from './utils/rdsClient';
+import { errorHandler } from './middleware/errorHandler';
 
 const app: Express = express();
 
@@ -28,20 +28,10 @@ app.use('/api/auth', authRoutes);
 app.use(errorHandler);
 
 // Start server
-checkDatabaseConnection().catch((error) =>
-  logger.error('Unable to verify RDS connection on startup', error)
-);
+// checkDatabaseConnection().catch((error) =>
+//   logger.error('Unable to verify RDS connection on startup', error)
+// );
 
 app.listen(env.port,env.host, () => {
   logger.info(`Server is running at http://${env.host}:${env.port}`);
-});
-
-// Prefetch DB credentials (optional) so we fail fast if the IAM role/secret is misconfigured
-warmDbCredentials().catch((error) => {
-  logger.warn('Database credentials are not available yet', error);
-});
-
-// Prefetch DB credentials (optional) so we fail fast if the IAM role/secret is misconfigured
-warmDbCredentials().catch((error) => {
-  logger.warn('Database credentials are not available yet', error);
 });
