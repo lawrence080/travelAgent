@@ -70,6 +70,70 @@ npm start
 - `GET /` - Welcome message
 - `GET /api/health` - Health check endpoint
 
+## Using AWS Secrets Manager for database credentials
+
+You can keep your database password out of `.env` by storing it in AWS Secrets Manager and letting your app fetch it at runtime.
+
+1. **Create a secret** (Console → Secrets Manager → *Store a new secret*):
+   - Secret type: *Other type of secret*.
+   - Key/value pairs (example):
+     ```json
+     {
+       "username": "database-1",
+       "password": "db_password",
+       "host": "<your-rds-endpoint>",
+       "dbName": "<database-name>",
+       "port": 5432
+     }
+     ```
+   - Name it (e.g., `travelagent/db-credentials`) and save.
+   - Optionally enable automatic rotation.
+
+2. **Create an IAM role for your app** (EC2/ECS/Lambda, etc.):
+   - Trust policy: the service that runs your app (e.g., `ec2.amazonaws.com` or `ecs-tasks.amazonaws.com`).
+   - Permission policy granting read access to the secret:
+     ```json
+     {
+       "Version": "2012-10-17",
+       "Statement": [
+         {
+           "Effect": "Allow",
+           "Action": ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret"],
+           "Resource": "arn:aws:secretsmanager:<region>:<account-id>:secret:travelagent/db-credentials*"
+         }
+       ]
+     }
+     ```
+   - Attach the policy to the role and associate the role with your compute resource.
+
+3. **Fetch the secret in the backend** using the AWS SDK for JavaScript (v3):
+   ```ts
+   import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
+
+   const secretsClient = new SecretsManagerClient({ region: process.env.AWS_REGION });
+
+   export async function getDbCredentials() {
+     const secretName = process.env.DB_SECRET_NAME || 'travelagent/db-credentials';
+     const res = await secretsClient.send(new GetSecretValueCommand({ SecretId: secretName }));
+     if (!res.SecretString) throw new Error('Secret value is empty');
+     return JSON.parse(res.SecretString) as {
+       username: string;
+       password: string;
+       host: string;
+       dbName: string;
+       port?: number;
+     };
+   }
+   ```
+
+4. **Supply environment variables** for the backend to locate the secret and region (no password needed locally):
+   ```env
+   AWS_REGION=us-east-1
+   DB_SECRET_NAME=travelagent/db-credentials
+   ```
+
+5. **Connect to the DB** with the retrieved values instead of hardcoded `RDS_USER`/`RDS_PASSWORD` values.
+
 ## Architecture
 
 ### Middleware
