@@ -2,6 +2,7 @@ import { Pool } from 'pg';
 import { env } from './environment';
 import { logger } from './logger';
 import { ApiError } from '../middleware/errorHandler';
+import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
 
 const pool = new Pool({
   host: env.rds.host,
@@ -17,6 +18,23 @@ export type PersistedUser = {
   name: string;
   email: string;
 };
+
+
+
+const secretsClient = new SecretsManagerClient({ region: process.env.AWS_REGION });
+
+export async function getDbCredentials() {
+  const secretName = process.env.DB_SECRET_NAME || 'travelagent/db-credentials';
+  const res = await secretsClient.send(new GetSecretValueCommand({ SecretId: secretName }));
+  if (!res.SecretString) throw new Error('Secret value is empty');
+  return JSON.parse(res.SecretString) as {
+    username: string;
+    password: string;
+    host: string;
+    dbName: string;
+    port?: number;
+  };
+}
 
 export const saveUserProfile = async (user: PersistedUser): Promise<void> => {
   const client = await pool.connect();

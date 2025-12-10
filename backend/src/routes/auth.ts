@@ -8,7 +8,7 @@ const router = Router();
 // Sign up endpoint
 router.post('/signup', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { name, email, password, confirm } = req.body;
+    const { name, email, password,birthdate, confirm } = req.body;
 
     if (!name || !email || !password || !confirm) {
       throw new ApiError(400, 'All fields are required');
@@ -21,13 +21,16 @@ router.post('/signup', async (req: Request, res: Response, next: NextFunction) =
     if (password.length < 8) {
       throw new ApiError(400, 'Password must be at least 8 characters');
     }
+    // if(!birthdate){
+    //   throw new ApiError(400, 'Birthdate is required');
+    // }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       throw new ApiError(400, 'Invalid email format');
     }
 
-    const signUpResponse = await registerUserWithCognito(name, email, password);
+    const signUpResponse = await registerUserWithCognito(name, email, password );
     const cognitoUserId = signUpResponse.UserSub;
 
     if (!cognitoUserId) {

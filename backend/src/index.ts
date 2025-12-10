@@ -32,6 +32,6 @@ checkDatabaseConnection().catch((error) =>
   logger.error('Unable to verify RDS connection on startup', error)
 );
 
-app.listen(env.port, () => {
-  logger.info(`Server is running at http://localhost:${env.port}`);
+app.listen(env.port,env.host, () => {
+  logger.info(`Server is running at http://${env.host}:${env.port}`);
 });
