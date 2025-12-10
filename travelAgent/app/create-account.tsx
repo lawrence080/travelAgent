@@ -197,7 +197,7 @@ export default function CreateAccountScreen() {
 
           <View style={styles.footer}>
             <ThemedText style={styles.noAccount}>Already have an account?</ThemedText>
-            <Pressable onPress={() => router.push('/signin')} disabled={loading}>
+            <Pressable onPress={() => router.replace('/signin')} disabled={loading}>
               <ThemedText style={styles.createAccount}>Sign In</ThemedText>
             </Pressable>
           </View>
