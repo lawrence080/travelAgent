@@ -1,14 +1,13 @@
 import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import authRoutes from './routes/auth';
-
-dotenv.config();
+import { env } from './utils/environment';
+import { logger } from './utils/logger';
+import { checkDatabaseConnection } from './utils/rdsClient';
+import { errorHandler } from './middleware/errorHandler';
 
 const app: Express = express();
-const port = process.env.PORT || 3000;
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -25,12 +24,14 @@ app.get('/', (req: Request, res: Response) => {
 // Auth routes
 app.use('/api/auth', authRoutes);
 
-import { errorHandler } from './middleware/errorHandler';
-
 // Error handling middleware (use centralized handler)
 app.use(errorHandler);
 
 // Start server
-app.listen(port, () => {
-  console.log(`Server is running at http://localhost:${port}`);
+checkDatabaseConnection().catch((error) =>
+  logger.error('Unable to verify RDS connection on startup', error)
+);
+
+app.listen(env.port, () => {
+  logger.info(`Server is running at http://localhost:${env.port}`);
 });
