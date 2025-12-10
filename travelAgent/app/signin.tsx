@@ -64,7 +64,7 @@ export default function SignInScreen() {
       if (response.success) {
         // Successfully signed in
         setIsSignedIn(true);
-        router.replace('/(tabs)');
+        router.replace('/(tabs)/home');
       }
     } catch (error: any) {
       const errorMessage = error.message || 'Failed to sign in. Please try again.';
