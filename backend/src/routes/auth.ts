@@ -37,11 +37,11 @@ router.post('/signup', async (req: Request, res: Response, next: NextFunction) =
       throw new ApiError(500, 'Unable to determine Cognito user identifier');
     }
 
-    await saveUserProfile({
-      id: cognitoUserId,
-      name,
-      email,
-    });
+    // await saveUserProfile({
+    //   id: cognitoUserId,
+    //   name,
+    //   email,
+    // });
 
     res.status(201).json({
       success: true,
