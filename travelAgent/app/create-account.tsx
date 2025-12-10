@@ -78,7 +78,7 @@ export default function CreateAccountScreen() {
       if (response.success) {
         // Account created successfully
         setIsSignedIn(true);
-        router.replace('/(tabs)/home');
+        router.replace('/(tabs)');
       }
     } catch (error: any) {
       const errorMessage = error.message || 'Failed to create account. Please try again.';
