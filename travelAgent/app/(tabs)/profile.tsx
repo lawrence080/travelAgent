@@ -4,6 +4,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { authAPI} from '@/utils/authAPI';
 import { useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useAuth } from '@/contexts/auth-context';
+
+const REMEMBER_ME_KEY = 'rememberMe';
 
 type ProfileForm = {
   name: string;
@@ -26,6 +30,7 @@ export default function ProfileScreen() {
   const [loading, setLoading] = useState(false);
   const [logouted, setLogouted] = useState(false);
   const router = useRouter();
+  const { setIsSignedIn } = useAuth();
 
 
   const handleChange = (key: keyof ProfileForm, value: string) => {
@@ -34,6 +39,7 @@ export default function ProfileScreen() {
   const handleLogout = async () => {
     // Implement logout functionality here
     setApiError('');
+    setLoading(true);
         try {
     
           const response = await authAPI.logout();
@@ -41,6 +47,8 @@ export default function ProfileScreen() {
           if (response.success) {
             // Successfully signed in
             setLogouted(true);
+            await AsyncStorage.removeItem(REMEMBER_ME_KEY);
+            setIsSignedIn(false);
             router.replace('../signin');
           }
         } catch (error: any) {

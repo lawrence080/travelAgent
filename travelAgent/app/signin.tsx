@@ -17,9 +17,11 @@ import { useAuth } from '@/contexts/auth-context';
 import { useRouter } from 'expo-router';
 import { authAPI, type SignInData } from '@/utils/authAPI';
 import { Image } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { height: WINDOW_HEIGHT } = Dimensions.get('window');
 const CARD_MAX_HEIGHT = Math.round(WINDOW_HEIGHT * 0.78);
+const REMEMBER_ME_KEY = 'rememberMe';
 
 export default function SignInScreen() {
   const [email, setEmail] = useState('');
@@ -27,6 +29,7 @@ export default function SignInScreen() {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [apiError, setApiError] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   const { setIsSignedIn } = useAuth();
   const router = useRouter();
 
@@ -63,6 +66,11 @@ export default function SignInScreen() {
 
       if (response.success) {
         // Successfully signed in
+        if (rememberMe) {
+          await AsyncStorage.setItem(REMEMBER_ME_KEY, 'true');
+        } else {
+          await AsyncStorage.removeItem(REMEMBER_ME_KEY);
+        }
         setIsSignedIn(true);
         router.replace('/(tabs)');
       }
@@ -139,10 +147,18 @@ export default function SignInScreen() {
               {errors.password ? <ThemedText style={styles.fieldError}>{errors.password}</ThemedText> : null}
 
               <View style={styles.rowBetween}>
-                <View style={styles.rememberRow}>
-                  <View style={styles.checkbox} />
+                <Pressable
+                  style={styles.rememberRow}
+                  onPress={() => setRememberMe((prev) => !prev)}
+                  disabled={loading}
+                  accessibilityRole="checkbox"
+                  accessibilityState={{ checked: rememberMe }}
+                >
+                  <View style={[styles.checkbox, rememberMe && styles.checkboxChecked]}>
+                    {rememberMe ? <Text style={styles.checkboxCheck}>✓</Text> : null}
+                  </View>
                   <ThemedText style={styles.rememberText}>Remember me</ThemedText>
-                </View>
+                </Pressable>
                 <Pressable onPress={() => console.log('forgot password')} disabled={loading}>
                   <ThemedText style={styles.forgot}>Forgot Password?</ThemedText>
                 </Pressable>
@@ -306,6 +322,17 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
     marginRight: 8,
     backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  checkboxChecked: {
+    backgroundColor: PRIMARY,
+    borderColor: PRIMARY,
+  },
+  checkboxCheck: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '700',
   },
   rememberText: {
     fontSize: 12,

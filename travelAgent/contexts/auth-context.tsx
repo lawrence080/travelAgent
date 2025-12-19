@@ -1,4 +1,7 @@
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const REMEMBER_ME_KEY = 'rememberMe';
 
 type AuthContextType = {
   isSignedIn: boolean;
@@ -13,11 +16,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // TODO: Check AsyncStorage or your auth service here
-    // For now, simulate a quick check
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 500);
+    const checkRememberedSession = async () => {
+      try {
+        const rememberValue = await AsyncStorage.getItem(REMEMBER_ME_KEY);
+        setIsSignedIn(rememberValue === 'true');
+      } catch (error) {
+        setIsSignedIn(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkRememberedSession();
   }, []);
 
   return (
