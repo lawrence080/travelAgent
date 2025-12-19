@@ -60,6 +60,12 @@ export default function ProfileScreen() {
         contentContainerStyle={styles.content}
         contentInsetAdjustmentBehavior="automatic"
         showsVerticalScrollIndicator={false}>
+
+        <TouchableOpacity>
+            <View style={styles.setupButton}>
+              <Ionicons name="pencil" size={16} color="#FF8A4C" />
+            </View>
+        </TouchableOpacity>
         <View style={styles.avatarWrap}>
           <Image
             source={{
@@ -83,13 +89,6 @@ export default function ProfileScreen() {
                 <Text style={styles.infoLabel}>{field.charAt(0).toUpperCase() + field.slice(1)}</Text>
                 <InfoValue field={field} />
               </View>
-              <TouchableOpacity
-                accessibilityRole="button"
-                accessibilityLabel={`Edit ${field}`}
-                onPress={() => setEditingField(field)}
-                style={styles.iconButton}>
-                <Ionicons name="pencil" size={18} color="#FF8A4C" />
-              </TouchableOpacity>
             </View>
           ))}
         </View>
@@ -169,6 +168,14 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.06,
     shadowOffset: { width: 0, height: 4 },
     shadowRadius: 12,
+  },
+  setupButton: {
+    marginTop: 12,
+    height: 48,
+    // set the button to to right corner of the screen
+    position: 'relative',
+    right: -100,
+    borderRadius: 14,
   },
   cardTitle: {
     fontSize: 18,
