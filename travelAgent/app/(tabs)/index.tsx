@@ -66,9 +66,6 @@ export default function HomeScreen() {
             </View>
             <Text style={styles.brandName}>GooseTravel</Text>
           </View>
-          <TouchableOpacity accessibilityRole="button" style={styles.avatarButton}>
-            <Ionicons name="person" size={20} color="#0F172A" />
-          </TouchableOpacity>
         </View>
 
         <Text style={styles.heading}>Where are we going next?</Text>

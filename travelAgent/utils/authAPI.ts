@@ -71,4 +71,26 @@ export const authAPI = {
       throw error;
     }
   },
+
+  // authapi.logout can be implemented here if needed
+  async logout(): Promise<AuthResponse> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/logout`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Logout failed');
+      }
+
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  },
 };

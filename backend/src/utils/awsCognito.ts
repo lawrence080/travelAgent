@@ -76,3 +76,17 @@ export const signInWithCognito = async (
     throw new ApiError(400, error?.message || 'Failed to sign in with Cognito');
   }
 };
+
+// sign out with cognito function
+export const signOutFromCognito = async (accessToken: string): Promise<void> => {
+  try {
+    // try to sign out the user by revoking the token
+    // Cognito does not have a direct sign-out API, so we can just log the action here
+    logger.info(`Signing out user with access token: ${accessToken}`);
+
+
+  } catch (error: any) {
+    logger.error('Cognito sign out failed', error);
+    throw new ApiError(400, error?.message || 'Failed to sign out with Cognito');
+  }
+};

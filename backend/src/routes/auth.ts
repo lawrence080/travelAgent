@@ -90,5 +90,21 @@ router.post('/signin', async (req: Request, res: Response, next: NextFunction) =
     next(error);
   }
 });
+// logout endpoint
+router.post('/logout', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    // In a real application, you might want to invalidate tokens or clear sessions here. 
+    const signOutFromCognito = async (accessToken: string): Promise<void> => {
+      // This is a placeholder function. Implement the actual sign-out logic with Cognito here.
+      console.log(`Signing out user with access token: ${accessToken}`);
+    };
+    res.status(200).json({
+      success: true,
+      message: 'Logged out successfully',
+    });
+  } catch (error) {
+    next(error);
+  }
+});
 
 export default router;
